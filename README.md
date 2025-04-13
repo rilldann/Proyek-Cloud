@@ -64,7 +64,7 @@ restaurant-reservation-app/
 
 ### 6. **🖌️ Wireframe UI/UX**
 
-<img src="https://www.figma.com/design/MPEvcUwECI938J1iNfgrl8/Untitled?node-id=0-1&t=As6cHknzTGDXE4VQ-1" alt="Tampilan Aplikasi 1" width="700px">
+[Lihat Desain di Figma](https://www.figma.com/design/MPEvcUwECI938J1iNfgrl8/Untitled?node-id=0-1&t=As6cHknzTGDXE4VQ-1)
 
 
 ### 7. **🗓️ Timeline Proyek**
