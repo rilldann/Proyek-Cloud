@@ -6,9 +6,9 @@ from flask_cors import CORS
 # Koneksi database PostgreSQL
 def get_db_connection():
     conn = psycopg2.connect(
-        host=os.environ.get("DB_HOST", "localhost"),
+        host=os.environ.get("DB_HOST", "db"), # Changed to 'db' as per docker-compose service name
         database=os.environ.get("DB_NAME", "restoran"),
-        user=os.environ.get("DB_USER", "mamat"),
+        user=os.environ.get("DB_USER", "student"), # Changed to 'student' as per docker-compose
         password=os.environ.get("DB_PASSWORD", "123")
     )
     return conn

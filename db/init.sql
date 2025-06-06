@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS reservations (
     name VARCHAR(100) NOT NULL,
     time TIMESTAMP NOT NULL,
     table_number INT,
-    status VARCHAR(20) DEFAULT 'reserved',
-    FOREIGN KEY (table_number) REFERENCES tables(id)
+    status VARCHAR(20) DEFAULT 'reserved'
 );
 
 CREATE TABLE IF NOT EXISTS reviews (
