@@ -185,6 +185,14 @@ const App = () => {
     { name: "Iga Bakar", price: "Rp.70.000", imageUrl: "/images/iga.jpeg" },
     { name: "Mix Platter", price: "Rp.35.000", imageUrl: "/images/mix.jpeg" },
   ]);
+  const [galleryImages, setGalleryImages] = useState([
+    { src: "/images/cafe.jpeg", alt: "Interior Kafe" },
+    { src: "/images/cafe2.jpeg", alt: "Suasana Kafe" },
+    { src: "/images/kopi.jpeg", alt: "Kopi Americano" },
+    { src: "/images/nasgor2.jpeg", alt: "Nasi Goreng" },
+    { src: "/images/mix.jpeg", alt: "Mix Platter" },
+    { src: "/images/aren.jpeg", alt: "Aren Latte" },
+  ]);
 
   // Mengambil data ulasan dari API
   useEffect(() => {
@@ -295,8 +303,10 @@ const App = () => {
           <a href="#our-story">Cerita Kami</a>
           <a href="#reviews">Ulasan</a>
           <a href="#reservations">Reservasi</a>
+          <a href="#gallery">Galeri</a> {/* New navigation link */}
           <a href="#team">Tim</a>
           <a href="#location">Lokasi</a>
+          <a href="#contact">Kontak</a> {/* New navigation link */}
         </nav>
       </header>
 
@@ -312,17 +322,17 @@ const App = () => {
         <h2>Menu Populer</h2>
         <div className="popular-items-grid">
           <div className="popular-item-card">
-            <div className="item-icon">🍔</div>
+            <img src="/images/burger.jpeg" alt="Burger" className="popular-item-image" /> {/* Placeholder */}
             <h3>Burger</h3>
             <p>20+ variasi</p>
           </div>
           <div className="popular-item-card">
-            <div className="item-icon">🍟</div>
+            <img src="/images/kentang.jpeg" alt="Kentang Goreng" className="popular-item-image" /> {/* Placeholder */}
             <h3>Kentang Goreng</h3>
             <p>Crispy dan lezat</p>
           </div>
           <div className="popular-item-card">
-            <div className="item-icon">🍰</div>
+            <img src="/images/dessert.jpeg" alt="Dessert" className="popular-item-image" /> {/* Placeholder */}
             <h3>Dessert</h3>
             <p>Manjakan diri dengan manis</p>
           </div>
@@ -343,19 +353,31 @@ const App = () => {
         </div>
       </section>
 
+      <section id="gallery" className="gallery-section">
+        <h2>Galeri Kami</h2>
+        <p>Jelajahi suasana dan hidangan terbaik kami.</p>
+        <div className="gallery-grid">
+          {galleryImages.map((image, index) => (
+            <div className="gallery-item" key={index}>
+              <img src={image.src} alt={image.alt} />
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section id="our-story" className="our-story-section">
         <h2>Cerita Kami</h2>
         <p>Temukan perjalanan Foodie Delight</p>
         <div className="story-cards">
           <div className="story-card">
-            <div className="story-icon"></div>
-            <h3>Dari Peternakan ke Piring</h3>
-            <p>Kami menggunakan bahan segar untuk hidangan kami.</p>
+            <img src="/images/barista.jpeg" alt="Dari Peternakan ke Piring" className="story-image" />
+            <h3>Dari Kami</h3>
+            <p>Kami berkomitmen untuk menyajikan hidangan terbaik dengan bahan-bahan paling segar, langsung dari sumbernya. Setiap bahan dipilih dengan cermat untuk memastikan kualitas dan rasa yang tak tertandingi.</p>
           </div>
           <div className="story-card">
-            <div className="story-icon"></div>
+            <img src="/images/pelanggan.jpeg" alt="Kepuasan Pelanggan" className="story-image" />
             <h3>Kepuasan Pelanggan</h3>
-            <p>Kepuasan Anda adalah prioritas utama kami.</p>
+            <p>Kepuasan Anda adalah inti dari segala yang kami lakukan. Kami berdedikasi untuk menciptakan pengalaman bersantap yang tak terlupakan, dari hidangan lezat hingga pelayanan yang ramah dan profesional.</p>
           </div>
         </div>
       </section>
@@ -456,12 +478,32 @@ const App = () => {
       )}
 
       <section id="team" className="team-section">
-        <div className="team-member-card">
-          <div className="member-avatar">☕</div>
-          <div className="member-details">
-            <h3>Rahmatullah</h3>
-            <p className="role">Barista & Manajer Kafe</p>
-            <p>Menciptakan pengalaman kopi terbaik untuk Anda.</p>
+        <h2>Tim Kami</h2>
+        <p>Kenali orang-orang di balik pengalaman kopi dan makanan Anda.</p>
+        <div className="team-members-grid"> {/* Changed to grid for multiple members */}
+          <div className="team-member-card">
+            <img src="/images/mamat.jpg" alt="Rahmatullah - Barista & Manajer Kafe" className="member-image" /> {/* Placeholder */}
+            <div className="member-details">
+              <h3>Rahmatullah</h3>
+              <p className="role">Manajer Kafe</p>
+              <p>Memastikan setiap aspek kafe berjalan lancar dan menyenangkan.</p>
+            </div>
+          </div>
+          <div className="team-member-card">
+            <img src="/images/dapa.jpg" alt="Daffa - Barista" className="member-image" /> {/* Placeholder */}
+            <div className="member-details">
+              <h3>Daffa</h3>
+              <p className="role">Barista</p>
+              <p>Meracik kopi dengan passion untuk pengalaman rasa yang sempurna.</p>
+            </div>
+          </div>
+          <div className="team-member-card">
+            <img src="/images/jidan.jpg" alt="Zidane - Kitchen" className="member-image" /> {/* Placeholder */}
+            <div className="member-details">
+              <h3>Zidane</h3>
+              <p className="role">Koki</p>
+              <p>Menciptakan hidangan lezat yang memanjakan lidah Anda.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -474,6 +516,29 @@ const App = () => {
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           ></iframe>
+        </div>
+      </section>
+
+      <section id="contact" className="contact-section">
+        <h2>Hubungi Kami</h2>
+        <p>Kami siap melayani Anda. Jangan ragu untuk menghubungi kami!</p>
+        <div className="contact-info-grid">
+          <div className="contact-card">
+            <div className="contact-icon">📞</div>
+            <h3>Telepon</h3>
+            <p>+62 852-0000-1111</p>
+          </div>
+          <div className="contact-card">
+            <div className="contact-icon">📧</div>
+            <h3>Email</h3>
+            <p>isekalacafe@gmail.com</p>
+          </div>
+          <div className="contact-card">
+            <div className="contact-icon">⏰</div>
+            <h3>Jam Buka</h3>
+            <p>Senin - Jumat: 08:00 - 22:00</p>
+            <p>Sabtu - Minggu: 09:00 - 23:00</p>
+          </div>
         </div>
       </section>
 
