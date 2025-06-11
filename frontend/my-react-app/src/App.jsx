@@ -71,8 +71,19 @@ const ReviewList = ({ reviews }) => {
 
 // Formulir untuk melakukan reservasi
 const ReservationForm = ({ onAddReservation }) => {
+  // Helper function to format current date/time for datetime-local input
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   const [name, setName] = useState("");
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState(getCurrentDateTime()); // Initialize with current time
   const [tableNumber, setTableNumber] = useState("");
 
   const handleSubmit = (e) => {
@@ -80,7 +91,7 @@ const ReservationForm = ({ onAddReservation }) => {
     const reservation = { name, time, table_number: tableNumber };
     onAddReservation(reservation);
     setName("");
-    setTime("");
+    setTime(getCurrentDateTime()); // Reset to current time after submit
     setTableNumber("");
   };
 
@@ -97,6 +108,7 @@ const ReservationForm = ({ onAddReservation }) => {
         type="datetime-local"
         value={time}
         onChange={(e) => setTime(e.target.value)}
+        min={getCurrentDateTime()} // Ensure that the selected time is not in the past
         required
       />
       <input
@@ -160,42 +172,63 @@ const App = () => {
 
   // Mengambil data ulasan dari API
   useEffect(() => {
-    fetch("http://backend:5000/api/reviews")
+    fetch("http://localhost:5000/api/reviews")
       .then((response) => response.json())
       .then((data) => setReviews(data));
   }, []);
 
   // Menambahkan ulasan baru
   const handleAddReview = (review) => {
-    fetch("http://backend:5000/api/reviews", {
+    fetch("http://localhost:5000/api/reviews", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(review),
     })
       .then((response) => response.json())
-      .then((newReview) => setReviews([newReview, ...reviews]));
+      .then((newReview) => {
+        // Add created_at to newReview to match the structure of fetched reviews
+        const reviewWithTimestamp = { ...newReview, created_at: new Date().toISOString() };
+        setReviews([reviewWithTimestamp, ...reviews]);
+      });
   };
 
   // Mengambil data reservasi dari API
   useEffect(() => {
-    fetch("http://backend:5000/api/reservations")
+    fetch("http://localhost:5000/api/reservations")
       .then((response) => response.json())
       .then((data) => setReservations(data));
   }, []);
 
   // Menambahkan reservasi baru
   const handleAddReservation = (reservation) => {
-    fetch("http://backend:5000/api/reservations", {
+    const localDate = new Date(reservation.time); // Parses "YYYY-MM-DDTHH:mm" as local time
+    
+    // Calculate timezone offset and adjust to send as UTC equivalent of local time
+    // getTimezoneOffset returns difference in minutes from UTC to local time.
+    // For UTC+8, it returns -480. So, subtracting it means adding 8 hours.
+    // This converts local time (e.g., 11:00 local) to a UTC time that is 8 hours ahead (e.g., 19:00 UTC).
+    // If backend stores this 19:00 UTC, then when frontend displays it (converting 19:00 UTC to local),
+    // it will be 19:00 - 8 hours = 11:00 local. This should fix the issue.
+    const offset = localDate.getTimezoneOffset(); // Offset in minutes from UTC to local time
+    const adjustedDate = new Date(localDate.getTime() - (offset * 60 * 1000)); // Subtract offset to get UTC equivalent
+    const timeToSend = adjustedDate.toISOString(); // Format as ISO string (e.g., "2025-06-11T03:00:00.000Z")
+
+    fetch("http://localhost:5000/api/reservations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(reservation),
+      body: JSON.stringify({ ...reservation, time: timeToSend }),
     })
       .then((response) => response.json())
       .then((newReservation) => {
+        // newReservation.time will be the ISO string from backend (e.g., "2025-06-11T03:00:00Z")
+        // When new Date() parses this, it's UTC. toLocaleString() converts to local.
+        // So, 03:00 UTC + 8 hours (local offset) = 11:00 local. This should work.
+        const displayTime = new Date(newReservation.time);
+        
         setReservations([newReservation, ...reservations]);
         Swal.fire({
           title: 'Reservation Confirmed!',
-          html: `Thank you, <strong>${newReservation.name}</strong>!<br>Your table number <strong>${newReservation.table_number}</strong> is reserved for <strong>${new Date(newReservation.time).toLocaleString()}</strong>.`,
+          html: `Thank you, <strong>${newReservation.name}</strong>!<br>Your table number <strong>${newReservation.table_number}</strong> is reserved for <strong>${displayTime.toLocaleString()}</strong>.`,
           icon: 'success',
           confirmButtonText: 'OK',
           customClass: {
@@ -256,6 +289,26 @@ const App = () => {
   </div>
 </section>
 
+      <section className="popular-items-section">
+        <h2>Popular Items</h2>
+        <div className="popular-items-grid">
+          <div className="popular-item-card">
+            <div className="item-icon">🍔</div>
+            <h3>Burgers</h3>
+            <p>20+ varieties</p>
+          </div>
+          <div className="popular-item-card">
+            <div className="item-icon">🍟</div>
+            <h3>Fries</h3>
+            <p>Crispy and flavorful</p>
+          </div>
+          <div className="popular-item-card">
+            <div className="item-icon">🍰</div>
+            <h3>Desserts</h3>
+            <p>Indulge in sweetness</p>
+          </div>
+        </div>
+      </section>
       <section id="featured-items" className="featured-items-section">
         <h2>Featured Items</h2>
         <p>Tempting dishes for you</p>
@@ -336,26 +389,6 @@ const App = () => {
         </div>
       </section>
 
-      <section className="popular-items-section">
-        <h2>Popular Items</h2>
-        <div className="popular-items-grid">
-          <div className="popular-item-card">
-            <div className="item-icon">🍔</div>
-            <h3>Burgers</h3>
-            <p>20+ varieties</p>
-          </div>
-          <div className="popular-item-card">
-            <div className="item-icon">🍟</div>
-            <h3>Fries</h3>
-            <p>Crispy and flavorful</p>
-          </div>
-          <div className="popular-item-card">
-            <div className="item-icon">🍰</div>
-            <h3>Desserts</h3>
-            <p>Indulge in sweetness</p>
-          </div>
-        </div>
-      </section>
       <section id="reservations" className="customer-reservations-section">
         <h2>Customer Reservations</h2>
         <p>See your booked tables</p>
@@ -385,7 +418,11 @@ const App = () => {
             </table>
           )}
         </div>
-        <button className="add-button" onClick={() => setShowReservationModal(true)}>Book a Table</button>
+        {showReservationModal ? null : ( // Conditionally render the button
+          <div className="reservation-button-wrapper">
+            <div className="add-button" role="button" onClick={() => setShowReservationModal(true)}>Book a Table</div>
+          </div>
+        )}
       </section>
 
       <section className="reservations-reviews-section">

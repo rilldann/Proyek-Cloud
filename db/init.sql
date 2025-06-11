@@ -1,8 +1,3 @@
-CREATE DATABASE IF NOT EXISTS restoran;
-
--- Gunakan database yang baru dibuat
-\c restoran;
-
 
 -- Create tables
 CREATE TABLE IF NOT EXISTS tables (
