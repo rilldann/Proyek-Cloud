@@ -7,6 +7,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./App.css";
 
+// Hardcoded backend URL untuk produksi Railway
+const BACKEND_URL = "https://proyek-cloud-production.up.railway.app";
+
+
 // Formulir untuk menambahkan ulasan
 const ReviewForm = ({ onAddReview }) => {
   const [userName, setUserName] = useState("");
@@ -188,14 +192,14 @@ const App = () => {
 
   // Mengambil data ulasan dari API
   useEffect(() => {
-    fetch("proyek-cloud-production.up.railway.app/api/reviews")
+    fetch(`${BACKEND_URL}/api/reviews`)
       .then((response) => response.json())
       .then((data) => setReviews(data));
   }, []);
 
   // Menambahkan ulasan baru
   const handleAddReview = (review) => {
-    fetch("proyek-cloud-production.up.railway.app/api/reviews", {
+    fetch(`${BACKEND_URL}/api/reviews`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(review),
@@ -209,7 +213,7 @@ const App = () => {
 
   // Mengambil data reservasi dari API
   useEffect(() => {
-    fetch("http://localhost:5000/api/reservations")
+    fetch(`${BACKEND_URL}/api/reservations`)
       .then((response) => response.json())
       .then((data) => setReservations(data));
   }, []);
@@ -217,7 +221,7 @@ const App = () => {
   // Menambahkan reservasi baru
   const handleAddReservation = (reservation, closeModal) => {
     console.log("Dikirim ke backend:", reservation.time);
-    fetch("http://localhost:5000/api/reservations", {
+    fetch(`${BACKEND_URL}/api/reservations`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(reservation),
