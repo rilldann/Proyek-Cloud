@@ -8,30 +8,30 @@ from urllib.parse import urlparse
 # Koneksi database PostgreSQL
 def get_db_connection():
     conn = None
-    while conn is None:
+    max_retries = 5
+    retry_count = 0
+    while conn is None and retry_count < max_retries:
         try:
-            # Ambil DATABASE_URL dari environment variable
             database_url = os.environ.get('DATABASE_URL')
             if not database_url:
                 raise ValueError("DATABASE_URL is not set in the environment variables")
-            
-            # Parse the URL
             result = urlparse(database_url)
-            
-            # Connect using the parsed information
             conn = psycopg2.connect(
                 host=result.hostname,
                 port=result.port,
                 user=result.username,
                 password=result.password,
-                database=result.path[1:]  # Remove leading slash from the path
+                database=result.path[1:]
             )
         except psycopg2.OperationalError as e:
             print(f"Database connection failed, retrying in 5 seconds... Error: {e}")
+            retry_count += 1
             time.sleep(5)
         except ValueError as e:
             print(f"Error: {e}")
-            break  # Exit if DATABASE_URL is not set
+            break
+    if conn is None:
+        raise Exception("Failed to connect to database after multiple retries")
     return conn
 
 # Inisialisasi aplikasi Flask
@@ -159,4 +159,5 @@ def delete_review(id):
 
 # Menjalankan aplikasi Flask
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))  # Use Railway's PORT or default to 5000
+    app.run(debug=False, host='0.0.0.0', port=port)  # Disable debug mode in production
