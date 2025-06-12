@@ -188,14 +188,14 @@ const App = () => {
 
   // Mengambil data ulasan dari API
   useEffect(() => {
-    fetch("http://localhost:5000/api/reviews")
+    fetch("proyek-cloud-production.up.railway.app/api/reviews")
       .then((response) => response.json())
       .then((data) => setReviews(data));
   }, []);
 
   // Menambahkan ulasan baru
   const handleAddReview = (review) => {
-    fetch("http://localhost:5000/api/reviews", {
+    fetch("proyek-cloud-production.up.railway.app/api/reviews", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(review),
