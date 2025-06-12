@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import time
 from urllib.parse import urlparse
+import logging
 
 # Koneksi database PostgreSQL
 def get_db_connection():
@@ -34,9 +35,15 @@ def get_db_connection():
         raise Exception("Failed to connect to database after multiple retries")
     return conn
 
+
+
 # Inisialisasi aplikasi Flask
 app = Flask(__name__)
 CORS(app)  # Enable CORS untuk frontend
+
+@app.route('/')
+def home():
+    return {"message": "Hello from Flask!"}
 
 # Endpoint untuk membuat reservasi (Create)
 @app.route('/api/reservations', methods=['POST'])
@@ -109,28 +116,36 @@ def delete_reservation(id):
     
     return jsonify({"message": "Reservation deleted successfully!"}), 200
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 # Endpoint untuk menambahkan ulasan (Create)
 @app.route('/api/reviews', methods=['POST'])
 def create_review():
-    data = request.json
-    user_name = data['user_name']
-    review_text = data['review_text']
-    rating = data['rating']
-    
-    # Pastikan rating antara 1 dan 5
-    if rating < 1 or rating > 5:
-        return jsonify({"error": "Rating must be between 1 and 5"}), 400
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("INSERT INTO reviews (user_name, review_text, rating) VALUES (%s, %s, %s) RETURNING id;",
-                (user_name, review_text, rating))
-    new_id = cur.fetchone()[0]
-    conn.commit()
-    cur.close()
-    conn.close()
+    logger.info(f"Received POST request to /api/reviews with data: {request.json}")
+    try:
+        data = request.json
+        user_name = data['user_name']
+        review_text = data['review_text']
+        rating = data['rating']
+        logger.info(f"Processing review for user: {user_name}, rating: {rating}")
 
-    return jsonify({"id": new_id, "user_name": user_name, "review_text": review_text, "rating": rating}), 201
+        if rating < 1 or rating > 5:
+            logger.error("Rating out of range")
+            return jsonify({"error": "Rating must be between 1 and 5"}), 400
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO reviews (user_name, review_text, rating) VALUES (%s, %s, %s) RETURNING id;",
+                    (user_name, review_text, rating))
+        new_id = cur.fetchone()[0]
+        conn.commit()
+        cur.close()
+        conn.close()
+        logger.info(f"Review created with id: {new_id}")
+        return jsonify({"id": new_id, "user_name": user_name, "review_text": review_text, "rating": rating}), 201
+    except Exception as e:
+        logger.error(f"Error in create_review: {e}")
+        return jsonify({"error": str(e)}), 500
 
 # Endpoint untuk mendapatkan semua ulasan (Read)
 @app.route('/api/reviews', methods=['GET'])
