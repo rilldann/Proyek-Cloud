@@ -8,4 +8,4 @@ COPY db/init.sql /app/db/init.sql
 COPY . .
 EXPOSE 5000
 # Run migration first, then start the Flask app
-CMD ["sh", "-c", "python migrate_db.py && python app.py"]
+CMD ["sh", "-c", "python migrate_db.py && gunicorn -w 4 -b 0.0.0.0:$PORT app:app"]
