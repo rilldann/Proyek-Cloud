@@ -23,7 +23,7 @@ def run_migration():
         print("Connection established!")  # Debugging lo
 
         # Read and execute schema.sql
-        with open('/app/db/schema.sql', 'r') as f:
+        with open('/app/db/init.sql', 'r') as f:
             schema = f.read()
             print(f"Executing schema: {schema[:100]}...")  # Debugging log (first 100 chars of schema)
             cur.execute(schema)
