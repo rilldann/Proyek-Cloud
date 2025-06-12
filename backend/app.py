@@ -180,5 +180,5 @@ def delete_review(id):
 
 # Menjalankan aplikasi Flask
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Use Railway's PORT or default to 5000
+    port = int(os.environ.get('PORT', 8080))  # Use Railway's PORT or default to 5000
     app.run(debug=False, host='0.0.0.0', port=port)  # Disable debug mode in production
