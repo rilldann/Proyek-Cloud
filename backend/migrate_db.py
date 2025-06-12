@@ -38,5 +38,5 @@ def run_migration():
             cur.close()
             conn.close()
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     run_migration()
