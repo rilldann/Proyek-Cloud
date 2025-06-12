@@ -117,25 +117,33 @@ def delete_reservation(id):
 # Endpoint untuk menambahkan ulasan (Create)
 @app.route('/api/reviews', methods=['POST'])
 def create_review():
-    data = request.json
-    user_name = data['user_name']
-    review_text = data['review_text']
-    rating = data['rating']
-    
-    # Pastikan rating antara 1 dan 5
-    if rating < 1 or rating > 5:
-        return jsonify({"error": "Rating must be between 1 and 5"}), 400
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("INSERT INTO reviews (user_name, review_text, rating) VALUES (%s, %s, %s) RETURNING id;",
-                (user_name, review_text, rating))
-    new_id = cur.fetchone()[0]
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        data = request.json
+        if not data or not all(key in data for key in ['user_name', 'review_text', 'rating']):
+            return jsonify({"error": "Missing required fields: user_name, review_text, rating"}), 400
+        
+        user_name = data['user_name']
+        review_text = data['review_text']
+        rating = data['rating']
+        
+        # Pastikan rating antara 1 dan 5
+        if not isinstance(rating, int) or rating < 1 or rating > 5:
+            return jsonify({"error": "Rating must be an integer between 1 and 5"}), 400
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO reviews (user_name, review_text, rating) VALUES (%s, %s, %s) RETURNING id;",
+                    (user_name, review_text, rating))
+        new_id = cur.fetchone()[0]
+        conn.commit()
+        cur.close()
+        conn.close()
 
-    return jsonify({"id": new_id, "user_name": user_name, "review_text": review_text, "rating": rating}), 201
+        return jsonify({"id": new_id, "user_name": user_name, "review_text": review_text, "rating": rating}), 201
+    except KeyError as e:
+        return jsonify({"error": f"Missing field: {str(e)}"}), 400
+    except Exception as e:
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 # Endpoint untuk mendapatkan semua ulasan (Read)
 @app.route('/api/reviews', methods=['GET'])
