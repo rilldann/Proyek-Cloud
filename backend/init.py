@@ -20,7 +20,7 @@ def run_migration():
             port=url.port
         )
         cur = conn.cursor()
-        print("Connection established!")  # Debugging lo
+        print("Connection established!")  # Debugging log
 
         # Read and execute schema.sql
         with open('/app/db/init.sql', 'r') as f:
@@ -38,5 +38,5 @@ def run_migration():
             cur.close()
             conn.close()
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     run_migration()
